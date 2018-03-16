@@ -1,0 +1,31 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cz.cvut.sindepe8.feeder.fragments.ArticleFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="5dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ArticleTitleTextView"
+                android:layout_marginVertical="2dp"
+                android:text="@string/hello_blank_fragment"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/ArticleContentTextView"
+                android:text="@string/hello_blank_fragment"
+                android:textSize="10sp"/>
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>
