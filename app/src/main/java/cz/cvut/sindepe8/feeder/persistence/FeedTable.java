@@ -1,12 +1,11 @@
 package cz.cvut.sindepe8.feeder.persistence;
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import static cz.cvut.sindepe8.feeder.persistence.DbConstants.*;
+import java.net.URL;
 
-/**
- * Created by petrs on 15-Apr-18.
- */
+import static cz.cvut.sindepe8.feeder.persistence.DbConstants.*;
 
 public class FeedTable {
     public static final String TABLE_FEED = "feedTable";
@@ -36,5 +35,12 @@ public class FeedTable {
     public static void dropAndCreateTable(SQLiteDatabase db){
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEED);
         onCreate(db);
+    }
+
+    public static ContentValues createContentValues(String title, String url){
+        ContentValues cv = new ContentValues();
+        cv.put(URL, url.toString());
+        cv.put(TITLE, title);
+        return cv;
     }
 }

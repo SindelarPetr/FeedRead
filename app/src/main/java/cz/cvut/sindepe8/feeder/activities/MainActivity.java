@@ -71,7 +71,14 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
                 Intent intent = new Intent(this, FeedsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_refresh:
+                refresh();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refresh(){
+
     }
 }

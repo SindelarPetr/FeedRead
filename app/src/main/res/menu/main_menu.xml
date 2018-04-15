@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_refresh"
+        android:title="@string/refresh"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_refresh_white_24dp"/>
     <item android:id="@+id/action_configure_feeds"
         android:title="@string/action_configure_feeds"
         app:showAsAction="ifRoom"

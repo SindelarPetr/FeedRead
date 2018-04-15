@@ -1,22 +1,19 @@
 package cz.cvut.sindepe8.feeder.activities;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +21,7 @@ import java.net.URL;
 import cz.cvut.sindepe8.feeder.R;
 import cz.cvut.sindepe8.feeder.cursors.FeedCursorAdapter;
 import cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider;
+import cz.cvut.sindepe8.feeder.persistence.FeedTable;
 
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.*;
 
@@ -45,6 +43,9 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         getLoaderManager().initLoader(FEED_LOADER, null, this);
     }
 
@@ -61,6 +62,9 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
                 Intent intent = new Intent(this, AddFeedActivity.class);
                 startActivityForResult(intent, REQUEST_ADD_FEED);
                 return true;
+            case android.R.id.home:
+                finish();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -73,16 +77,10 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
         if(requestCode != REQUEST_ADD_FEED || resultCode == AddFeedActivity.RESULT_CANCEL)
             return;
 
-        String textUrl = data.getStringExtra(AddFeedActivity.DATA_URL);
-        try {
-            URL url = new URL(textUrl);
+        String url = data.getStringExtra(AddFeedActivity.DATA_URL);
+        String title = data.getStringExtra(AddFeedActivity.DATA_TITLE);
 
-            // Add the url to the database
-
-            // Add the url to the list of feeds
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        insertContentValue(FeedTable.createContentValues(title, url));
     }
 
     @Override
@@ -119,5 +117,14 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
             default:
                 break;
         }
+    }
+
+    public void fillDatabase(View view) {
+        ContentValues cv = FeedTable.createContentValues("Mobilmania", "https://www.mobilmania.cz/rss/sc-47/");
+        insertContentValue(cv);
+    }
+
+    private void insertContentValue(ContentValues cv) {
+        getContentResolver().insert(FeedReaderContentProvider.CONTENT_URI, cv);
     }
 }

@@ -13,6 +13,11 @@
         app:title="@string/feeds_title"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:background="?attr/colorPrimary"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fill data"
+        android:onClick="fillDatabase"/>
     <ListView
         android:id="@+id/feeds"
         android:layout_width="match_parent"

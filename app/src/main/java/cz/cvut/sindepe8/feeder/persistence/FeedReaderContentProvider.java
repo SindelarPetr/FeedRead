@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.sun.syndication.feed.atom.Feed;
+
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.ID;
 
 /**
@@ -34,7 +36,6 @@ public class FeedReaderContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         feedReadDbHelper = new FeedReadDatabaseHelper(getContext());
-        FeedTable.dropAndCreateTable(feedReadDbHelper.getWritableDatabase());
         return false;
     }
 
