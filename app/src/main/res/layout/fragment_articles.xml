@@ -4,18 +4,9 @@
     android:layout_height="match_parent"
     tools:context="cz.cvut.sindepe8.feeder.fragments.ArticlesFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="0dp">
-        <LinearLayout
+    <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/ArticlesLinearLayout"
-            android:orientation="vertical">
-
-        </LinearLayout>
-
-    </ScrollView>
+            android:id="@+id/articles_list_view"/>
 
 </FrameLayout>

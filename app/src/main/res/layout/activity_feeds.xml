@@ -5,21 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="cz.cvut.sindepe8.feeder.activities.MainActivity">
-
+    tools:context="cz.cvut.sindepe8.feeder.activities.FeedsActivity">
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:title="@string/feeds_title"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:background="?attr/colorPrimary"
-        app:title="@string/app_name"/>
-
-    <FrameLayout
+        android:background="?attr/colorPrimary"/>
+    <ListView
+        android:id="@+id/feeds"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/ArticlesFragmentLayout">
-
-    </FrameLayout>
-
+        android:layout_height="match_parent"/>
 </LinearLayout>

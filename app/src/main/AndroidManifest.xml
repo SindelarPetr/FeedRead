@@ -7,16 +7,23 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name="cz.cvut.sindepe8.feeder.activities.MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="cz.cvut.sindepe8.feeder.activities.ArticleDetailActivity"></activity>
+        <activity android:name=".activities.ArticleDetailActivity" />
+        <activity android:name=".activities.FeedsActivity" />
+        <activity android:name=".activities.AddFeedActivity"/>
+
+        <provider
+            android:name="cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider"
+            android:authorities="cz.cvut.sindepe8"
+            android:exported="false"/>
     </application>
 
 </manifest>
