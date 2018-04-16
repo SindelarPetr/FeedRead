@@ -3,10 +3,10 @@ package cz.cvut.sindepe8.feeder.models;
 public class ArticleModel {
     private String title;
     private String content;
-    private String url = "https://www.mobilmania.cz/clanky/black-shark-logo-xiaomi-chybi-a-za-herni-ovladac-se-priplaci/sc-3-a-1341523/default.aspx";
+    private String url;
     private int id;
 
-    public ArticleModel(int id, String title, String description)
+    public ArticleModel(int id, String title, String description, String url)
     {
         this.id = id;
         this.title = title;

@@ -18,8 +18,11 @@ import cz.cvut.sindepe8.feeder.fragments.ArticlesFragment;
 import cz.cvut.sindepe8.feeder.services.FeedService;
 
 public class MainActivity extends AppCompatActivity implements ArticlesFragment.IArticlesFragmentListener {
-
+    private final int ARTICLE_LOADER = 2;
     private ArticlesFragment fragment;
+    public ArticlesFragment GetArticlesFragment(){
+        return fragment;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +41,6 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
         FragmentTransaction ft = fm.beginTransaction();
         ft.add(R.id.ArticlesFragmentLayout, fragment);
         ft.commit();
-
-        FeedService.InitService();
-
-        try {
-            FeedService.RefreshArticles();
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
     }
 
     @Override
@@ -58,27 +52,15 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
         startActivity(intent);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_configure_feeds:
-                Intent intent = new Intent(this, FeedsActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_refresh:
-                refresh();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     private void refresh(){
+        // Get all feeds
 
+        // Iterate all feeds
+
+        // For each feed get articles
+
+        // Save articled to the database
+
+        // ListView with feeds should be updated automatically
     }
 }

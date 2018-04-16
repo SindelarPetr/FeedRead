@@ -6,10 +6,20 @@
     android:paddingLeft="16dp"
     android:paddingRight="10dp"
     >
-<TextView
-    android:id="@+id/article_title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:layout_gravity="center_vertical"/>
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:textSize="12dp"
+        />
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical" />
 </FrameLayout>

@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class FeedReadDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "feedread.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public FeedReadDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -18,13 +18,14 @@ public class FeedReadDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        FeedTable.dropAndCreateTable(db);
-        //FeedTable.onCreate(db);
+        FeedTable.onCreate(db);
+        ArticleTable.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         FeedTable.onUpgrade(db, oldVersion, newVersion);
+        ArticleTable.onUpgrade(db, oldVersion, newVersion);
     }
 
     @Override

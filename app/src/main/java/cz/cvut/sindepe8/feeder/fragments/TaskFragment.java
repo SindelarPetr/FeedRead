@@ -1,14 +1,16 @@
 package cz.cvut.sindepe8.feeder.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
 
 import java.net.URL;
 import java.util.List;
 
+import cz.cvut.sindepe8.feeder.activities.MainActivity;
 import cz.cvut.sindepe8.feeder.models.ArticleItemModel;
 
 /**
@@ -30,9 +32,9 @@ public class TaskFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
-        mCallbacks = (TaskCallbacks) activity;
+        mCallbacks = (TaskCallbacks) ((MainActivity)activity).GetArticlesFragment();
     }
 
     @Override

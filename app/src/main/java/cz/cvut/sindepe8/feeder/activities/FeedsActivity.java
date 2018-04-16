@@ -87,7 +87,7 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case FEED_LOADER:
-                return new CursorLoader(FeedsActivity.this, FeedReaderContentProvider.CONTENT_URI, new String[] { ID, URL, TITLE}, null, null, null);
+                return new CursorLoader(FeedsActivity.this, FeedReaderContentProvider.FEEDS_URI, new String[] { ID, URL, TITLE}, null, null, null);
             default:
                 break;
         }
@@ -125,6 +125,6 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
     private void insertContentValue(ContentValues cv) {
-        getContentResolver().insert(FeedReaderContentProvider.CONTENT_URI, cv);
+        getContentResolver().insert(FeedReaderContentProvider.FEEDS_URI, cv);
     }
 }

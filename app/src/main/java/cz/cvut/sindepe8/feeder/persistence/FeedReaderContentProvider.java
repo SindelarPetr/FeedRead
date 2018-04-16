@@ -23,14 +23,21 @@ public class FeedReaderContentProvider extends ContentProvider {
 
     private static final int FEED_LIST = 1;
     private static final int FEED_ID = 2;
+    private static final int ARTICLE_LIST = 3;
+    private static final int ARTICLE_ID = 4;
 
-    private static final String BASE_PATH = "feeds";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
+    private static final String BASE_PATH = "content";
+    private static final String FEED_PATH = "/feeds";
+    private static final String ARTICLES_PATH = "/articles";
+    public static final Uri FEEDS_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH + FEED_PATH);
+    public static final Uri ARTICLES_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH + ARTICLES_PATH);
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH, FEED_LIST);
-        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", FEED_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + FEED_PATH, FEED_LIST);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + FEED_PATH + "/#", FEED_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + ARTICLES_PATH, ARTICLE_LIST);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + ARTICLES_PATH + "/#", ARTICLE_ID);
     }
 
     @Override
@@ -50,6 +57,13 @@ public class FeedReaderContentProvider extends ContentProvider {
                 break;
             case FEED_ID:
                 queryBuilder.setTables(FeedTable.TABLE_FEED);
+                queryBuilder.appendWhere(ID + "=" + uri.getLastPathSegment());
+                break;
+            case ARTICLE_LIST:
+                queryBuilder.setTables(ArticleTable.TABLE_ARTICLE);
+                break;
+            case ARTICLE_ID:
+                queryBuilder.setTables(ArticleTable.TABLE_ARTICLE);
                 queryBuilder.appendWhere(ID + "=" + uri.getLastPathSegment());
                 break;
             default:
@@ -76,6 +90,9 @@ public class FeedReaderContentProvider extends ContentProvider {
         switch (uriType) {
             case FEED_LIST:
                 id = sqlDB.insert(FeedTable.TABLE_FEED, null, values);
+                break;
+            case ARTICLE_LIST:
+                id = sqlDB.insert(ArticleTable.TABLE_ARTICLE, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
