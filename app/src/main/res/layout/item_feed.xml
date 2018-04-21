@@ -10,15 +10,20 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#444444"/>
+        android:textColor="#444444"
+        android:textStyle="bold"
+        android:paddingBottom="8dp"
+        android:textSize="@dimen/item_title"
+        android:ellipsize="end"/>
     <TextView
         android:id="@+id/url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="10sp"/>
-    <Button
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/delete"/>
+        android:textSize="@dimen/item_content"
+        android:ellipsize="end"/>
+    <!--<Button-->
+        <!--android:id="@+id/delete"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/delete"/>-->
 </LinearLayout>

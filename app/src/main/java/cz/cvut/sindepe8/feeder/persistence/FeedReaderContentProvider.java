@@ -8,8 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.sun.syndication.feed.atom.Feed;
-
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.ID;
 
 /**
@@ -113,6 +111,13 @@ public class FeedReaderContentProvider extends ContentProvider {
             case FEED_ID:
                 String id = uri.getLastPathSegment();
                 rowsDeleted = sqlDB.delete(FeedTable.TABLE_FEED, ID + "=" + id, null);
+                break;
+            case ARTICLE_LIST:
+                rowsDeleted = sqlDB.delete(ArticleTable.TABLE_ARTICLE, selection, selectionArgs);
+                break;
+            case ARTICLE_ID:
+                id = uri.getLastPathSegment();
+                rowsDeleted = sqlDB.delete(ArticleTable.TABLE_ARTICLE, ID + "=" + id, null);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);

@@ -21,22 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
-import java.util.Dictionary;
-import java.util.List;
-import java.util.zip.Inflater;
+import android.widget.ProgressBar;
 
 import cz.cvut.sindepe8.feeder.R;
-import cz.cvut.sindepe8.feeder.activities.FeedsActivity;
-import cz.cvut.sindepe8.feeder.cursors.ArticlesCursorAdapter;
+import cz.cvut.sindepe8.feeder.activities.ArticleDetailActivity;
+import cz.cvut.sindepe8.feeder.adapters.ArticlesCursorAdapter;
 import cz.cvut.sindepe8.feeder.models.ArticleModel;
-import cz.cvut.sindepe8.feeder.persistence.DbConstants;
 import cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider;
-import cz.cvut.sindepe8.feeder.persistence.FeedTable;
-import cz.cvut.sindepe8.feeder.services.FeedService;
 
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.CONTENT;
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.ID;
@@ -47,34 +39,14 @@ import static cz.cvut.sindepe8.feeder.persistence.DbConstants.URL;
  * A simple {@link Fragment} subclass.
  */
 public class ArticlesFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor>, TaskFragment.TaskCallbacks {
+    private final String STATE_REFRESHING = "refreshing";
     private final int ARTICLE_LOADER = 2;
-    private IArticlesFragmentListener listener;
+
     private ListView articlesListView;
     private ArticlesCursorAdapter adapter;
     private boolean refreshing = false;
     private TaskFragment taskFragment;
-
-
-    public ArticlesFragment() {
-        // Required empty public constructor
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if(context instanceof IArticlesFragmentListener)
-        {
-            this.listener = (IArticlesFragmentListener)context;
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        this.listener = null;
-    }
+    private ProgressBar progressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +60,12 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
             taskFragment = new TaskFragment();
             fm.beginTransaction().add(taskFragment, "task").commit();
         }
+
+
+
+        if(savedInstanceState != null) {
+            refreshing = savedInstanceState.getBoolean(STATE_REFRESHING);
+        }
     }
 
     @Override
@@ -100,11 +78,19 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         articlesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ArticleModel article = (ArticleModel) parent.getItemAtPosition(position);
+                ArticleModel article = ((ArticlesCursorAdapter.ViewHolder) view.getTag()).getArticle();
 
-                listener.ArticleSelected(article.getId());
+                // Start a new activity which will get the article id in bundle
+                Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
+                intent.putExtra(ArticleDetailActivity.BUNDLE_ARTICLE_ID, article.getId());
+                startActivity(intent);
+
             }
         });
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        progressBar = toolbar.findViewById(R.id.progress);
+        progressBar.setVisibility(refreshing ? View.VISIBLE : View.GONE);
 
         adapter = new ArticlesCursorAdapter(getContext(), null, 0);
         articlesListView.setAdapter(adapter);
@@ -133,26 +119,17 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_REFRESHING, refreshing);
+    }
+
     private void refresh(){
 
         // Start TaskFragment
         taskFragment.executeTask();
-
-
-        // Get all feeds
-        //Cursor cursor = getActivity().getContentResolver().query(FeedReaderContentProvider.FEEDS_URI, new String[] { ID, TITLE, URL}, null, null, null);
-
-        // Iterate all feeds
-        //while (cursor.moveToNext()) {
-        //    String url = cursor.getString(cursor.getColumnIndex(DbConstants.URL));
-
-            // For each feed get articles
-
-            // Save articles to the database
-        //}
-        // ListView with feeds should be updated automatically
-
-        //cursor.close();
     }
 
     @NonNull
@@ -196,6 +173,7 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
     public void onPreExecute() {
         refreshing = true;
         getActivity().invalidateOptionsMenu();
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -207,20 +185,14 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
     public void onCancelled() {
         refreshing = false;
         getActivity().invalidateOptionsMenu();
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onPostExecute() {
         refreshing = false;
         getActivity().invalidateOptionsMenu();
+        progressBar.setVisibility(View.GONE);
     }
-
-    public interface IArticlesFragmentListener{
-        void ArticleSelected(int articleId);
-    }
-
-    private void insertContentValue(ContentValues cv) {
-        getActivity().getContentResolver().insert(FeedReaderContentProvider.ARTICLES_URI, cv);
-}
 }
 

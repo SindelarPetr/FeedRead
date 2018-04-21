@@ -1,11 +1,17 @@
 package cz.cvut.sindepe8.feeder.fragments;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.ShareActionProvider;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,7 +22,8 @@ import android.widget.TextView;
 
 import cz.cvut.sindepe8.feeder.R;
 import cz.cvut.sindepe8.feeder.models.ArticleModel;
-import cz.cvut.sindepe8.feeder.services.FeedService;
+import cz.cvut.sindepe8.feeder.persistence.DbConstants;
+import cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,17 +35,26 @@ public class ArticleFragment extends Fragment {
 
     private TextView headerTextView;
     private TextView contentTextView;
-    private ArticleModel article;
+    private String title;
+    private String content;
+    private String uri;
 
     public void DisplayArticle(int articleId)
     {
-        article = FeedService.GetArticleById(articleId);
+        // Get the article by the ID
+        Cursor cursor = getContext().getContentResolver().query(FeedReaderContentProvider.ARTICLES_URI, new String[]{DbConstants.URL, DbConstants.CONTENT, DbConstants.TITLE},
+                "_id = ?", new String[] { Integer.toString(articleId) }, null);
 
-        if(article == null)
-            return;
+        if(!cursor.moveToFirst()) {
+            throw new Resources.NotFoundException("Couldnt find an article with such ID");
+        }
 
-        headerTextView.setText(article.getTitle());
-        contentTextView.setText(article.getContent());
+        title = cursor.getString(cursor.getColumnIndex(DbConstants.TITLE));
+        uri = cursor.getString(cursor.getColumnIndex(DbConstants.URL));
+        content = cursor.getString(cursor.getColumnIndex(DbConstants.CONTENT));
+
+        headerTextView.setText(title);
+        contentTextView.setText(content);
     }
 
     @Override
@@ -54,12 +70,35 @@ public class ArticleFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_article, container, false);
 
         // Get header and content TextViews
-        headerTextView = view.findViewById(R.id.ArticleTitleTextView);
-        contentTextView = view.findViewById(R.id.ArticleContentTextView);
+        headerTextView = view.findViewById(R.id.title);
+        contentTextView = view.findViewById(R.id.content);
 
         // Get article id
         int articleId = getArguments().getInt(BUNDLE_ARTICLE_ID, -1);
         DisplayArticle(articleId);
+
+        final FloatingActionButton fab = view.findViewById(R.id.open_in_browser);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                startActivity(intent);
+            }
+        });
+
+
+        // Nested scroll view
+        NestedScrollView nsv = view.findViewById(R.id.scrollView);
+        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (scrollY > oldScrollY) {
+                    fab.hide();
+                } else {
+                    fab.show();
+                }
+            }
+        });
 
         return view;
     }
@@ -77,8 +116,8 @@ public class ArticleFragment extends Fragment {
     private void setShareActionIntent(){
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TITLE, article.getTitle());
-        intent.putExtra(Intent.EXTRA_TEXT, article.getContent());
+        intent.putExtra(Intent.EXTRA_TITLE, title);
+        intent.putExtra(Intent.EXTRA_TEXT, content);
         shareActionProvider.setShareIntent(intent);
     }
 }

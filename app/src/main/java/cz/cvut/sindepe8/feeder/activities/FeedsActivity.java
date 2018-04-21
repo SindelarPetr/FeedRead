@@ -1,25 +1,29 @@
 package cz.cvut.sindepe8.feeder.activities;
 
+import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import cz.cvut.sindepe8.feeder.R;
-import cz.cvut.sindepe8.feeder.cursors.FeedCursorAdapter;
+import cz.cvut.sindepe8.feeder.adapters.FeedCursorAdapter;
+import cz.cvut.sindepe8.feeder.persistence.FeedReadDatabaseHelper;
 import cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider;
 import cz.cvut.sindepe8.feeder.persistence.FeedTable;
 
@@ -39,6 +43,17 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
         mListView = findViewById(R.id.feeds);
         mAdapter = new FeedCursorAdapter(this, null, 0);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedFeedId = ((FeedCursorAdapter.ViewHolder) view.getTag()).getId(); // ASK - how to make it clean
+                new AlertDialog.Builder(FeedsActivity.this)
+                        .setTitle("Delete feed")
+                        .setMessage("Do you want to delete the feed?")
+                        .setPositiveButton("Delete", new ConfirmDeleteDialogListener(selectedFeedId))
+                        .setNegativeButton("Cancel", null).show();
+            }
+        });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -119,12 +134,37 @@ public class FeedsActivity extends AppCompatActivity implements LoaderManager.Lo
         }
     }
 
-    public void fillDatabase(View view) {
-        ContentValues cv = FeedTable.createContentValues("Mobilmania", "https://www.mobilmania.cz/rss/sc-47/");
-        insertContentValue(cv);
-    }
-
     private void insertContentValue(ContentValues cv) {
         getContentResolver().insert(FeedReaderContentProvider.FEEDS_URI, cv);
+    }
+
+    public void addMobilmania(View view) {
+        insertFeed("Mobilmania", "https://www.mobilmania.cz/rss/sc-47/");
+    }
+
+    public void addSmartmania(View view) {
+        insertFeed("Smartmania", "https://smartmania.cz/feed/");
+    }
+
+    public void addZive(View view) {
+        insertFeed("Zive", "https://www.zive.cz/rss/sc-47");
+    }
+
+    private class ConfirmDeleteDialogListener implements Dialog.OnClickListener {
+        String id;
+        public ConfirmDeleteDialogListener(String id){
+            super();
+            this.id = id;
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            getContentResolver().delete(Uri.withAppendedPath(FeedReaderContentProvider.FEEDS_URI, id), null, null);
+        }
+    }
+
+    private void insertFeed(String title, String url){
+        ContentValues cv = FeedTable.createContentValues(title, url);
+        insertContentValue(cv);
     }
 }

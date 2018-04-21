@@ -13,11 +13,27 @@
         app:title="@string/feeds_title"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:background="?attr/colorPrimary"/>
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Fill data"
-        android:onClick="fillDatabase"/>
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mobilmania"
+            android:onClick="addMobilmania"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zive"
+            android:onClick="addZive"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smartmania"
+            android:onClick="addSmartmania"/>
+
+    </LinearLayout>
     <ListView
         android:id="@+id/feeds"
         android:layout_width="match_parent"

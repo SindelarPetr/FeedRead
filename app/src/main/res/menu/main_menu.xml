@@ -7,6 +7,6 @@
         android:icon="@drawable/ic_refresh_white_24dp"/>
     <item android:id="@+id/action_configure_feeds"
         android:title="@string/action_configure_feeds"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:icon="@drawable/ic_rss_feed_white_24dp"/>
 </menu>
