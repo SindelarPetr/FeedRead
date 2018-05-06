@@ -13,4 +13,5 @@
     <string name="delete">Delete</string>
     <string name="title">Title</string>
     <string name="refresh">Refresh</string>
+    <string name="select_an_article_on_the_left">Select an article on the left.</string>
 </resources>

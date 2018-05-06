@@ -31,9 +31,12 @@ public class ArticleDetailActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        int articleId = intent.getExtras().getInt(BUNDLE_ARTICLE_ID);
         Bundle bundle = new Bundle();
-        bundle.putInt(ArticleFragment.BUNDLE_ARTICLE_ID, articleId);
+
+        if(intent.getExtras().containsKey(BUNDLE_ARTICLE_ID)) {
+            int articleId = intent.getExtras().getInt(BUNDLE_ARTICLE_ID);
+            bundle.putInt(ArticleFragment.BUNDLE_ARTICLE_ID, articleId);
+        }
 
         ArticleFragment fragment = new ArticleFragment();
         fragment.setArguments(bundle);

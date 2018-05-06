@@ -33,6 +33,7 @@ public class ArticleFragment extends Fragment {
 
     private ShareActionProvider shareActionProvider;
 
+    private TextView placeholder;
     private TextView headerTextView;
     private TextView contentTextView;
     private String title;
@@ -41,12 +42,20 @@ public class ArticleFragment extends Fragment {
 
     public void DisplayArticle(int articleId)
     {
+        if(articleId == -1)
+            return;
+
+        // Hide select an article text
+        if(placeholder != null)
+            placeholder.setVisibility(View.INVISIBLE);
+
         // Get the article by the ID
         Cursor cursor = getContext().getContentResolver().query(FeedReaderContentProvider.ARTICLES_URI, new String[]{DbConstants.URL, DbConstants.CONTENT, DbConstants.TITLE},
                 "_id = ?", new String[] { Integer.toString(articleId) }, null);
 
         if(!cursor.moveToFirst()) {
-            throw new Resources.NotFoundException("Couldnt find an article with such ID");
+            return;
+            //throw new Resources.NotFoundException("Couldnt find an article with such ID: " + articleId);
         }
 
         title = cursor.getString(cursor.getColumnIndex(DbConstants.TITLE));
@@ -72,10 +81,13 @@ public class ArticleFragment extends Fragment {
         // Get header and content TextViews
         headerTextView = view.findViewById(R.id.title);
         contentTextView = view.findViewById(R.id.content);
+        placeholder = view.findViewById(R.id.select_article_text);
 
         // Get article id
-        int articleId = getArguments().getInt(BUNDLE_ARTICLE_ID, -1);
-        DisplayArticle(articleId);
+        if(getArguments() != null) {
+            int articleId = getArguments().getInt(BUNDLE_ARTICLE_ID, -1);
+            DisplayArticle(articleId);
+        }
 
         final FloatingActionButton fab = view.findViewById(R.id.open_in_browser);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -88,30 +100,30 @@ public class ArticleFragment extends Fragment {
 
 
         // Nested scroll view
-        NestedScrollView nsv = view.findViewById(R.id.scrollView);
-        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY > oldScrollY) {
-                    fab.hide();
-                } else {
-                    fab.show();
-                }
-            }
-        });
+//        NestedScrollView nsv = view.findViewById(R.id.scrollView);
+//        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                if (scrollY > oldScrollY) {
+//                    fab.hide();
+//                } else {
+//                    fab.show();
+//                }
+//            }
+//        });
 
         return view;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.article_detail_menu, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_share);
-
-        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-        setShareActionIntent();
-        super.onCreateOptionsMenu(menu, inflater);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.article_detail_menu, menu);
+//        MenuItem menuItem = menu.findItem(R.id.action_share);
+//
+//        shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+//        setShareActionIntent();
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
 
     private void setShareActionIntent(){
         Intent intent = new Intent(Intent.ACTION_SEND);

@@ -48,6 +48,8 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
     private TaskFragment taskFragment;
     private ProgressBar progressBar;
 
+    private ArticleSelectionListener listener;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,11 +63,15 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
             fm.beginTransaction().add(taskFragment, "task").commit();
         }
 
-
-
         if(savedInstanceState != null) {
             refreshing = savedInstanceState.getBoolean(STATE_REFRESHING);
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        listener = (ArticleSelectionListener)context;
     }
 
     @Override
@@ -80,10 +86,12 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ArticleModel article = ((ArticlesCursorAdapter.ViewHolder) view.getTag()).getArticle();
 
+                listener.articleSelected(article.getId());
+
                 // Start a new activity which will get the article id in bundle
-                Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
-                intent.putExtra(ArticleDetailActivity.BUNDLE_ARTICLE_ID, article.getId());
-                startActivity(intent);
+                //Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
+                //intent.putExtra(ArticleDetailActivity.BUNDLE_ARTICLE_ID, article.getId());
+                //startActivity(intent);
 
             }
         });
@@ -97,6 +105,12 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
 
         getLoaderManager().initLoader(ARTICLE_LOADER, null, this);
         return view;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
     }
 
     @Override
@@ -121,9 +135,9 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
 
         outState.putBoolean(STATE_REFRESHING, refreshing);
+        super.onSaveInstanceState(outState);
     }
 
     private void refresh(){
@@ -193,6 +207,10 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         refreshing = false;
         getActivity().invalidateOptionsMenu();
         progressBar.setVisibility(View.GONE);
+    }
+
+    public interface ArticleSelectionListener{
+        public void articleSelected(int id);
     }
 }
 

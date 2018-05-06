@@ -147,15 +147,6 @@ public class TaskFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-
-
-            // Save articles to db
-
-            // Some time to simulate latency
-            for (int i = 0; !isCancelled() && i < 30; i++) {
-                SystemClock.sleep(100);
-                publishProgress(i);
-            }
             return null;
         }
 
