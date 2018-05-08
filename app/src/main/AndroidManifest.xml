@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cz.cvut.sindepe8.feeder">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,11 +22,30 @@
         </activity>
         <activity android:name=".activities.ArticleDetailActivity" />
         <activity android:name=".activities.FeedsActivity" />
-        <activity android:name=".activities.AddFeedActivity"/>
+        <activity android:name=".activities.AddFeedActivity" />
 
         <provider
-            android:name="cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider"
+            android:name=".persistence.FeedReaderContentProvider"
             android:authorities="cz.cvut.sindepe8"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <service
+            android:name=".services.DownloadService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".broadcastReceivers.BootBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".broadcastReceivers.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
+
 </manifest>

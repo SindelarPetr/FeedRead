@@ -38,10 +38,6 @@ import cz.cvut.sindepe8.feeder.persistence.FeedTable;
 
 //import
 
-/**
- * Created by petrs on 13-Apr-18.
- */
-
 public class TaskFragment extends Fragment {
     private TaskCallbacks mCallbacks;
     private ArticlesAsyncTask mTask;

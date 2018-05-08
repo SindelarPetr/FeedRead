@@ -1,11 +1,19 @@
 package cz.cvut.sindepe8.feeder.fragments;
 
 
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,6 +37,7 @@ import cz.cvut.sindepe8.feeder.activities.ArticleDetailActivity;
 import cz.cvut.sindepe8.feeder.adapters.ArticlesCursorAdapter;
 import cz.cvut.sindepe8.feeder.models.ArticleModel;
 import cz.cvut.sindepe8.feeder.persistence.FeedReaderContentProvider;
+import cz.cvut.sindepe8.feeder.services.DownloadService;
 
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.CONTENT;
 import static cz.cvut.sindepe8.feeder.persistence.DbConstants.ID;
@@ -45,10 +54,16 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
     private ListView articlesListView;
     private ArticlesCursorAdapter adapter;
     private boolean refreshing = false;
-    private TaskFragment taskFragment;
+    //private TaskFragment taskFragment;
     private ProgressBar progressBar;
 
     private ArticleSelectionListener listener;
+
+    private ArticlesHandler mHandler;
+    Messenger mService;
+    boolean mIsBound;
+    final Messenger mMessenger = new Messenger(new ArticlesHandler());
+    private ServiceConnection mConnection = new ArticlesServiceConnection();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,16 +71,19 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         setHasOptionsMenu(true);
 
         FragmentManager fm = getFragmentManager();
-        taskFragment = (TaskFragment) fm.findFragmentByTag("task");
 
-        if (taskFragment == null) {
-            taskFragment = new TaskFragment();
-            fm.beginTransaction().add(taskFragment, "task").commit();
-        }
+        //taskFragment = (TaskFragment) fm.findFragmentByTag("task");
+        //if (taskFragment == null) {
+         //   taskFragment = new TaskFragment();
+        //    fm.beginTransaction().add(taskFragment, "task").commit();
+        //}
 
         if(savedInstanceState != null) {
             refreshing = savedInstanceState.getBoolean(STATE_REFRESHING);
+            return;
         }
+
+        mHandler = new ArticlesHandler();
     }
 
     @Override
@@ -87,12 +105,6 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
                 ArticleModel article = ((ArticlesCursorAdapter.ViewHolder) view.getTag()).getArticle();
 
                 listener.articleSelected(article.getId());
-
-                // Start a new activity which will get the article id in bundle
-                //Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
-                //intent.putExtra(ArticleDetailActivity.BUNDLE_ARTICLE_ID, article.getId());
-                //startActivity(intent);
-
             }
         });
 
@@ -104,6 +116,10 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         articlesListView.setAdapter(adapter);
 
         getLoaderManager().initLoader(ARTICLE_LOADER, null, this);
+
+        // Bind to service
+        doBindService();
+
         return view;
     }
 
@@ -140,10 +156,17 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        doUnbindService();
+    }
+
     private void refresh(){
 
-        // Start TaskFragment
-        taskFragment.executeTask();
+        // Start downloading
+        getContext().startService(new Intent(getContext(), DownloadService.class));
     }
 
     @NonNull
@@ -209,8 +232,64 @@ public class ArticlesFragment extends android.support.v4.app.Fragment implements
         progressBar.setVisibility(View.GONE);
     }
 
+    void doBindService() {
+        Intent intent = new Intent(getActivity().getApplicationContext(), DownloadService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    void doUnbindService() {
+        if(!mIsBound)
+            return;
+
+        if(mService != null) {
+            try {
+                Message msg = Message.obtain(null, DownloadService.MSG_UNREGISTER);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            }
+            catch (RemoteException e) { }
+            getActivity().unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
     public interface ArticleSelectionListener{
         public void articleSelected(int id);
+    }
+
+    private class ArticlesHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case DownloadService.MSG_DOWNLOAD_STARTED:
+                    onPreExecute();
+                    break;
+                case DownloadService.MSG_DOWNLOAD_FINISHED:
+                    onPostExecute();
+                    break;
+                default: super.handleMessage(msg);
+            }
+        }
+    }
+
+    private class ArticlesServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+            try {
+                Message msg = Message.obtain(null, DownloadService.MSG_REGISTER);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            }
+            catch (RemoteException e) { }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
     }
 }
 

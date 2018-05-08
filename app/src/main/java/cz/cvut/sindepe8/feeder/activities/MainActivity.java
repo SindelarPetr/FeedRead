@@ -1,5 +1,8 @@
 package cz.cvut.sindepe8.feeder.activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.PersistableBundle;
 import android.support.v4.app.Fragment;
@@ -8,12 +11,14 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import cz.cvut.sindepe8.feeder.R;
 import cz.cvut.sindepe8.feeder.fragments.ArticleFragment;
 import cz.cvut.sindepe8.feeder.fragments.ArticlesFragment;
+import cz.cvut.sindepe8.feeder.services.DownloadService;
 
 public class MainActivity extends AppCompatActivity implements ArticlesFragment.ArticleSelectionListener {
     private final String ARTICLES_FRAGMENT = "ArticlesFragment";
@@ -66,6 +71,18 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
             }
             ft.commit();
         }
+
+        // Start alarms for downloading
+        AlarmManager am = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        long interval = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15;
+        long time = System.currentTimeMillis() + interval;
+        Intent launchIntent = new Intent(this, AlarmManager.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, launchIntent, PendingIntent.FLAG_NO_CREATE);
+        // pendingIntent is null when the alarm is already set
+        if(pendingIntent != null) {
+            am.setRepeating(AlarmManager.RTC_WAKEUP, time, interval, pendingIntent);
+            Log.i("BootBroadcastReceiver", "Alarm has been set.");
+        }
     }
 
     @Override
@@ -98,5 +115,11 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
             // On landscape - display the article
             GetArticleFragment().DisplayArticle(id);
         }
+    }
+
+    private void startDownloadService() {
+        Intent startIntent = new Intent(this, DownloadService.class);
+        //startIntent.putExtra(DownloadService.EXTRA_LOG_MESSAGE, logMessage);
+        startService(startIntent);
     }
 }
