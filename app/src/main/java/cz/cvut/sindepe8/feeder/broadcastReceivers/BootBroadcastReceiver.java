@@ -21,7 +21,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         long interval = 2 * AlarmManager.INTERVAL_HOUR;
         long time = System.currentTimeMillis() + interval;
-        Intent launchIntent = new Intent(context, AlarmManager.class);
+        Intent launchIntent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, launchIntent, PendingIntent.FLAG_NO_CREATE);
 
         // pendingIntent is null when the alarm is already set

@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import cz.cvut.sindepe8.feeder.R;
+import cz.cvut.sindepe8.feeder.broadcastReceivers.AlarmReceiver;
 import cz.cvut.sindepe8.feeder.fragments.ArticleFragment;
 import cz.cvut.sindepe8.feeder.fragments.ArticlesFragment;
 import cz.cvut.sindepe8.feeder.services.DownloadService;
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements ArticlesFragment.
         AlarmManager am = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         long interval = AlarmManager.INTERVAL_FIFTEEN_MINUTES / 15;
         long time = System.currentTimeMillis() + interval;
-        Intent launchIntent = new Intent(this, AlarmManager.class);
+        Intent launchIntent = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, launchIntent, PendingIntent.FLAG_NO_CREATE);
         // pendingIntent is null when the alarm is already set
         if(pendingIntent != null) {
